@@ -13,7 +13,8 @@ import Tavern from './Tavern'
 import Salon from './Salon'
 import EditPlayer from './EditPlayer'
 
-const url = 'http://localhost:3000'
+// const url = 'http://localhost:3000'
+const url = 'http://devveron2.devacademy.nz:3000'
 
 const socket = io(url)
 
