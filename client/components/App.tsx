@@ -5,13 +5,22 @@ import { Nav } from './Nav'
 import io from 'socket.io-client'
 import { useEffect, useState, useCallback } from 'react'
 import { Player } from '../../models/player'
-import { Route, Routes, useNavigate, useBeforeUnload } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import NewPlayer from './NewPlayer'
 import Frame from './Frame'
 import TownSquare from './TownSquare'
 import Tavern from './Tavern'
 import Salon from './Salon'
 import EditPlayer from './EditPlayer'
+import Church from './Church'
+import ItemShop from './ItemShop'
+import Docks from './Docks'
+import TownEntrance from './TownEntrance'
+import AdventurerCamp from './AdventurerCamp'
+import Quarry from './Quarry'
+import Woods from './Woods'
+import Castle from './Castle'
+import Cave from './Cave'
 
 // const url = 'http://localhost:3000'
 const url = 'http://devveron2.devacademy.nz:3000'
@@ -19,21 +28,13 @@ const url = 'http://devveron2.devacademy.nz:3000'
 const socket = io(url)
 
 function App() {
-  const { user, isAuthenticated } = useAuth0()
+  const { user } = useAuth0()
   const [player, setPlayer] = useState({} as Player)
   const nav = useNavigate()
 
   const loggingOut = useCallback(() => {
     socket.emit('logging out', player)
   }, [player])
-
-  useBeforeUnload(
-    useCallback(() => {
-      if (isAuthenticated) {
-        loggingOut()
-      }
-    }, [loggingOut, isAuthenticated])
-  )
 
   useEffect(() => {
     console.log(user)
@@ -53,6 +54,46 @@ function App() {
     nav('/create')
   })
 
+  // Custom functions to be passed into the components, to replace setPlayer
+
+  const addGold = (gold: number) => {
+    player.gold += gold
+    setPlayer(player)
+    socket.emit('update gold', player.gold)
+  }
+
+  const updateQuests = (quests: Record<string, number>) => {
+    const progress = {
+      ...player.progress,
+      quests: { ...player.progress.quests, ...quests },
+    }
+    setPlayer({
+      ...player,
+      progress,
+    })
+    socket.emit('update progress', progress)
+  }
+  const updateEvents = (events: Record<string, boolean>) => {
+    const progress = {
+      ...player.progress,
+      events: { ...player.progress.events, ...events },
+    }
+    setPlayer({
+      ...player,
+      progress,
+    })
+    socket.emit('update progress', progress)
+  }
+  const addItems = (items: string[]) => {
+    const inventory = [...player.inventory, ...items]
+    setPlayer({ ...player, inventory })
+    socket.emit('update inventory', inventory)
+  }
+  const removeItems = (items: string[]) => {
+    const inventory = player.inventory.filter((i) => !items.includes(i))
+    setPlayer({ ...player, inventory })
+    socket.emit('update inventory', inventory)
+  }
   return (
     <>
       <Nav loggingOut={loggingOut} />
@@ -64,14 +105,103 @@ function App() {
         <Routes>
           <Route path="" element={<p>Loading...</p>} />
           <Route path="/create" element={<NewPlayer socket={socket} />} />
-          {/* <Route path="/update" element={<EditPlayer />} /> */}
-          <Route path="/loc/" element={<Frame socket={socket} />}>
+          <Route
+            path="/update"
+            element={
+              <EditPlayer
+                socket={socket}
+                player={player}
+                setPlayer={setPlayer}
+              />
+            }
+          />
+          <Route
+            path="/loc/"
+            element={
+              <Frame socket={socket} player={player} setPlayer={setPlayer} />
+            }
+          >
             <Route
               path="town-square"
-              element={<TownSquare player={player} setPlayer={setPlayer} />}
+              element={
+                <TownSquare player={player} updateEvents={updateEvents} />
+              }
             />
-            <Route path="tavern" element={<Tavern />} />
-            <Route path="salon" element={<Salon />} />
+            <Route
+              path="tavern"
+              element={
+                <Tavern
+                  player={player}
+                  removeItems={removeItems}
+                  addGold={addGold}
+                  updateEvents={updateEvents}
+                />
+              }
+            />
+            <Route
+              path="salon"
+              element={
+                <Salon
+                  player={player}
+                  updateEvents={updateEvents}
+                  socket={socket}
+                />
+              }
+            />
+            <Route
+              path="church"
+              element={<Church player={player} setPlayer={setPlayer} />}
+            />
+            <Route
+              path="item-shop"
+              element={<ItemShop player={player} setPlayer={setPlayer} />}
+            />
+            <Route
+              path="docks"
+              element={
+                <Docks
+                  player={player}
+                  setPlayer={setPlayer}
+                  addItems={addItems}
+                />
+              }
+            />
+            <Route
+              path="town-entrance"
+              element={<TownEntrance player={player} setPlayer={setPlayer} />}
+            />
+            <Route
+              path="adventurer-camp"
+              element={<AdventurerCamp player={player} setPlayer={setPlayer} />}
+            />
+            <Route
+              path="quarry"
+              element={
+                <Quarry
+                  player={player}
+                  setPlayer={setPlayer}
+                  addGold={addGold}
+                />
+              }
+            />
+            <Route
+              path="woods"
+              element={
+                <Woods
+                  player={player}
+                  addItems={addItems}
+                  updateEvents={updateEvents}
+                />
+              }
+            />
+            <Route
+              path="castle"
+              element={<Castle player={player} setPlayer={setPlayer} />}
+            />
+            <Route
+              path="cave"
+              element={<Cave player={player} setPlayer={setPlayer} />}
+            />
           </Route>
         </Routes>
       </IfAuthenticated>

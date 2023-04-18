@@ -9,10 +9,10 @@ export function addPlayer(
     .insert(player)
     .then(() => ({
       ...player,
-      gold: 0,
+      gold: 20,
       location: 'town-square',
-      progress: {},
-      inventory: [],
+      progress: { quests: {}, events: {} },
+      inventory: ['Ruby', 'Pocketknife'],
     }))
 }
 
