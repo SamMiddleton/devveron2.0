@@ -22,13 +22,7 @@ import Woods from './Woods'
 import Castle from './Castle'
 import Cave from './Cave'
 
-<<<<<<< HEAD
 const url = 'https://devveron2.devacademy.nz'
-=======
-// Deployment special:
-// const url = 'http://localhost:3000'
-const url = 'http://devveron2.devacademy.nz'
->>>>>>> e582effb4cd28c314e39fb86b306b7fc5b988484
 
 const socket = io(url)
 
