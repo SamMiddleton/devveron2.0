@@ -11,7 +11,7 @@ export function Nav({ loggingOut }: Props) {
   const handleSignOut = () => {
     console.log('sign out', user?.nickname)
     loggingOut()
-    logout()
+    logout({ returnTo: encodeURI('https://devveron2.devacademy.nz') })
   }
 
   const handleSignIn = () => {

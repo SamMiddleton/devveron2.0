@@ -22,7 +22,7 @@ import Woods from './Woods'
 import Castle from './Castle'
 import Cave from './Cave'
 
-const url = 'http://localhost:3000'
+const url = 'https://devveron2.devacademy.nz'
 
 const socket = io(url)
 
